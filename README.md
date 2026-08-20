@@ -5,60 +5,59 @@
 </p>
 <p align="center">
   <a href="https://github.com/amitashwinibhagat/pi-bare"><img alt="pi-bare" src="https://img.shields.io/badge/pi--bare-2--tools-00D084?style=for-the-badge&labelColor=111" /></a>
-  <a href="https://github.com/amitashwinibhagat/pi-bare"><img alt="token saving" src="https://img.shields.io/badge/token%20saving-80%25-ff3b30?style=for-the-badge" /></a>
+  <a href="https://github.com/amitashwinibhagat/pi-bare"><img alt="leaner prompt" src="https://img.shields.io/badge/prompt-leaner-00D084?style=for-the-badge" /></a>
   <a href="https://www.npmjs.com/package/@earendil-works/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@earendil-works/pi-coding-agent?style=flat-square" /></a>
   <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
 </p>
 
-> **🔥 pi-bare — The 2-Tool Killer Fork. 80% fewer tokens. Same power. 3× cheaper. Fork of `badlogic/pi-mono` tuned for the token-router era.**
+> **pi-bare — A leaner fork of `badlogic/pi-mono` with a minimal prompt and 2-tool default.**
 
 ---
 
 # ⚡ pi-bare — Do More With Less
 
-**Pi was already the most minimal agent harness. pi-bare goes further: `read` + `bash` is all you need.**
+**Pi was already minimal. pi-bare trims the prompt and defaults to `read` + `bash` — with opt-in for the rest.**
 
-Unix got it right 50 years ago: everything is a file, everything is bash. Why pay the LLM 400 tokens to learn `edit` and `write` when `cat > file <<'EOF'` does it for 15?
+Unix philosophy: `bash` can already read, write, edit, and search. pi-bare defaults to `read` + `bash` and lets you add `edit`/`write` with `--tools` only when you want them.
 
 ### The numbers don't lie
 
 ```
-BEFORE (pi 0.84.2)                    AFTER (pi-bare)
-─────────────────────────────         ─────────────────────────────
-System prompt:  1,712 chars → 428 tok   58 chars → 15 tok     -96%
-Tools (4→2):    ~1,800 tok               ~800 tok             -55%
-Compaction:     keep 20k / reserve 16k   keep 4k / reserve 4k  -75%
-Thinking:       high (2-4k reasoning)    low (300-600)        -70%
-──────────────────────────────────────────────────────────────
-Vanilla pi:     ~2,228 tok       →     ~815 tok               -63%
-+ My 29 .kilo skills*: ~1,856 tok injected  0 tok (opt-in)    -100%
-With my skills: ~4,084 tok       →     ~815 tok               -80%
-*I added 29 custom skills (~/.kilo/skills) — vanilla pi has 0
-Cost on Opencode/Cerebras/Groq:  ~$0.04 → ~$0.008 per 10 turns (with my skills)
-Context: ~30 turns → 120+ turns before compaction
+BEFORE (pi 0.84.2)                         AFTER (pi-bare) — est. chars/4
+─────────────────────────────────        ─────────────────────────────────
+System prompt:  ~1,712 chars (~428 tok*)   ~47 chars (~12 tok*)    ~-97%  (*est.)
+Tool schemas:   4 tools verbose            2 tools terse             smaller
+Compaction:     keep 20,000 / reserve 16,384   keep 4,096 / reserve 4,000
+Thinking:       configurable (e.g. high)   configurable (e.g. low) — you choose
+─────────────────────────────────        ─────────────────────────────────
+Vanilla prompt + tools (est.):  ~2,000-2,400 tok  →  ~800-900 tok   ~-60%
+With N custom skills: each ~50-65 tok in old <available_skills> XML → 0 tok unless PI_BARE_SKILLS=1
+
+*Token est. using chars/4 heuristic; provider tokenizers differ. Measure with your model.
+*Vanilla pi ships with 0 skills; my settings.json lists 29 ~/.kilo/skills paths but files not present, so 0 injected currently.
 ```
 
-> **Real session:** 50-turn audit that cost $1.20 on pi now costs $0.24 on pi-bare. Same patch, same tests green.
+> **Example:** Fewer prompt tokens = fewer input tokens billed each turn. Actual saving depends on provider, model, and session length.
 
 ### Why 2 tools beat 7
 
-| You want to... | Old pi (7 tools) | pi-bare (2 tools) | Token saving |
+| You want to... | Old pi (7 tools) | pi-bare (2 tools) | Notes |
 |---|---|---|---|
 | Read a file | `read` | `read` (or `bash: cat`) | — |
-| Edit a file | `edit {old,new}` | `bash: apply_patch <<'PATCH'`, `sed -i`, `cat > file` | -770 tok schema |
-| Create a file | `write` | `bash: cat > file <<'EOF'` | -182 tok |
-| Search code | `grep` / `find` / `ls` | `bash: rg, fd, ls, ag, grep` | -1,295 tok |
-| Anything else | tool learns new schema | `bash` already knows it | ∞ |
+| Edit a file | `edit {old,new}` | `bash: apply_patch <<'PATCH'`, `sed -i`, `cat > file` | No edit schema when not needed |
+| Create a file | `write` | `bash: cat > file <<'EOF'` | No write schema when not needed |
+| Search code | `grep` / `find` / `ls` | `bash: rg, fd, ls, ag, grep` | Uses tools you already have |
+| Anything else | new tool schema | `bash` already knows it | — |
 
-**The model already knows bash.** Stop re-teaching it.
+**The model already knows bash.**
 
-### Built for the new stack
+### When this helps
 
-- **Free-tier killers:** `muse-spark-free` via Opencode/TokenRouter — finally profitable at scale. Run 100 agents for the price of 20.
-- **Groq / Cerebras / Sambanova:** where input tokens = latency. 80% less prompt = 2× TTFT.
-- **Self-hosted / Ollama / llama.cpp:** fits 4k context models that choked on pi's 4k system prompt.
-- **Long sessions:** `AGENTS.md` + skills no longer eat your context. 120+ turns before compaction vs 30.
-- **Cleaner reasoning:** less instruction noise = fewer "I should use edit tool" hallucinations.
+- **Free-tier / low-cost models** (`muse-spark-free` via Opencode/TokenRouter, etc.): fewer prompt tokens per turn can lower cost — actual cost depends on pricing.
+- **Latency-sensitive providers** (Groq / Cerebras / etc.): smaller prompt can reduce time-to-first-token; gains vary by provider.
+- **Self-hosted / Ollama / llama.cpp:** slimmer prompt leaves more room in tight context windows.
+- **Long sessions:** optional skill/context injection (opt-in via `PI_BARE_SKILLS=1` / `PI_BARE_CTX=1`) keeps prompt small when not needed.
+- **Simpler reasoning:** shorter prompt = less to parse; effects vary by model.
 
 ### Quick start
 

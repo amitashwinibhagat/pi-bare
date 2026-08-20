@@ -1,20 +1,22 @@
-# pi-bare — 80% token saving fork
+# pi-bare — leaner fork (fewer prompt tokens)
 
-Fork of `badlogic/pi-mono`. Default is **read+bash only**.  
-*Note: vanilla pi ships with 0 skills; I added 29 in `~/.kilo/skills` for testing — savings above show both vanilla and my setup.*
+Fork of `badlogic/pi-mono`. Default is **read+bash only**.
 
-## What changed (vs 0.84.2)
+*Note: vanilla pi ships with 0 skills. My `~/.pi/agent/settings.json` lists 29 `~/.kilo/skills` paths, but files are not present, so 0 injected currently.*
 
-| Area | Before | After | Saving |
+## What changed (vs 0.84.2, est. chars/4)
+
+| Area | Before | After | Notes |
 |---|---|---|---|
-| system prompt | 1712 chars, ~428 tok, docs + guidelines | `pi agent. CWD:/tmp Tools:read,bash. Be concise.` ~58 chars, 15 tok | -96% |
-| my skills* | `~/.kilo/skills` 29 custom (1856 tok in my setup; vanilla pi has 0) | 0 tok unless `PI_BARE_SKILLS=1` | -100% if you have them |
-| tools | 4 tools verbose desc (`Read the contents… 360 chars`) | `read:Read file`, `bash:Run bash`, params `path/cmd/old/new` | -55% tool tok |
-| default tools | `read,bash,edit,write` | `read,bash` (edit/write opt-in: `pi --tools read,bash,edit,write`) | -500 tok |
-| compaction | keep 20000 / reserve 16384 | keep 4096 / reserve 4000 | -12k context |
+| system prompt | ~1,712 chars (~428 tok*) | `pi agent. CWD:/tmp Tools:read,bash. Be concise.` ~47 chars (~12 tok*) | Smaller prompt |
+| custom skills | if you add N skills, each ~50-65 tok in old XML | 0 tok unless `PI_BARE_SKILLS=1` | Opt-in |
+| tools | 4 tools verbose descriptions | 2 tools terse (`Read file`, `Run bash`, params `path`/`cmd`) | Less schema |
+| default tools | `read,bash,edit,write` | `read,bash` (add `edit,write` with `pi --tools read,bash,edit,write`) | Opt-in |
+| compaction | keep 20,000 / reserve 16,384 | keep 4,096 / reserve 4,000 | Less reserved |
 
-**Total: vanilla ~2,228 → ~815 (-63%); with my 29 skills ~4,084 → ~815 (-80%)**  
-*my skills added later — clarify per your note, not in vanilla pi
+*Token est. using chars/4 heuristic; provider tokenizers differ.
+
+**Total (est.): vanilla ~2,000-2,400 tok → ~800-900 tok (~-60%). With N skills, subtract ~50-65 tok per skill that would have been injected.**
 
 ## Usage
 
@@ -22,10 +24,10 @@ Fork of `badlogic/pi-mono`. Default is **read+bash only**.
 # bare (default)
 pi -p "fix file.ts"
 
-# with edit/write
+# with edit/write when you need them
 pi --tools read,bash,edit,write -p "fix file.ts"
 
-# re-enable skills/context if needed
+# re-enable skills/context if you have them
 PI_BARE_SKILLS=1 PI_BARE_CTX=1 pi
 
 # full 7 tools (old behaviour)
@@ -37,15 +39,16 @@ pi --tools read,bash,edit,write,grep,find,ls
 ```bash
 git clone https://github.com/amitashwinibhagat/pi-bare.git
 cd pi-bare
-npm run build   # requires tsgo (npm install -g @earendil-works/tsgo or use bun)
+npm install --ignore-scripts
+npm run build:offline   # or npm run build (requires tsgo)
 npm link        # or npm install -g ./packages/coding-agent
 ```
 
 ## Source changes
-- `packages/coding-agent/src/core/system-prompt.ts`
-- `packages/coding-agent/src/core/tools/index.ts` (coding = read+bash)
-- `packages/coding-agent/src/core/skills.ts` (opt-in)
-- `packages/coding-agent/src/core/compaction/compaction.ts` + `settings-manager.ts`
-- `packages/coding-agent/src/core/tools/{read,bash,edit,write,grep,find,ls}.ts` (short descs)
+- `packages/coding-agent/src/core/system-prompt.ts` — minimal prompt, opt-in skills/context
+- `packages/coding-agent/src/core/tools/index.ts` — coding = read+bash
+- `packages/coding-agent/src/core/skills.ts` — opt-in via env
+- `packages/coding-agent/src/core/compaction/compaction.ts` + `settings-manager.ts` — 4096/4000
+- `packages/coding-agent/src/core/tools/{read,bash,edit,write,grep,find,ls}.ts` — short descriptions
 
-Revert: `git checkout main -- packages/coding-agent/src/core`
+Revert: `git checkout upstream/main -- packages/coding-agent/src/core`

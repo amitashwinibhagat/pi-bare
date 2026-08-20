@@ -12,7 +12,7 @@ Fork of `badlogic/pi-mono`. Default is **read+bash only**.
 | custom skills | if you add N skills, each ~50-65 tok in old XML | 0 tok unless `PI_BARE_SKILLS=1` | Opt-in |
 | tools | 4 tools verbose descriptions | 2 tools terse (`Read file`, `Run bash`, params `path`/`cmd`) | Less schema |
 | default tools | `read,bash,edit,write` | `read,bash` (add `edit,write` with `pi --tools read,bash,edit,write`) | Opt-in |
-| compaction | keep 20,000 / reserve 16,384 | keep 4,096 / reserve 4,000 | Less reserved |
+| compaction | keep 20,000 / reserve 16,384 | keep 20,000 / reserve 16,384 | Same as vanilla |
 
 *Token est. using chars/4 heuristic; provider tokenizers differ.
 
@@ -48,7 +48,7 @@ npm link        # or npm install -g ./packages/coding-agent
 - `packages/coding-agent/src/core/system-prompt.ts` — minimal prompt, opt-in skills/context
 - `packages/coding-agent/src/core/tools/index.ts` — coding = read+bash
 - `packages/coding-agent/src/core/skills.ts` — opt-in via env
-- `packages/coding-agent/src/core/compaction/compaction.ts` + `settings-manager.ts` — 4096/4000
+- `packages/coding-agent/src/core/compaction/compaction.ts` + `settings-manager.ts` — vanilla 20000/16384 (reverted from 4096/4000)
 - `packages/coding-agent/src/core/tools/{read,bash,edit,write,grep,find,ls}.ts` — short descriptions
 
 Revert: `git checkout upstream/main -- packages/coding-agent/src/core`

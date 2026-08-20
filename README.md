@@ -26,14 +26,16 @@ Unix got it right 50 years ago: everything is a file, everything is bash. Why pa
 BEFORE (pi 0.84.2)                    AFTER (pi-bare)
 ─────────────────────────────         ─────────────────────────────
 System prompt:  1,712 chars → 428 tok   58 chars → 15 tok     -96%
-Skills (29):    1,856 tok injected       0 tok (opt-in)       -100%
-Tools (4):      ~1,800 tok               ~800 tok (2 tools)   -55%
+Tools (4→2):    ~1,800 tok               ~800 tok             -55%
 Compaction:     keep 20k / reserve 16k   keep 4k / reserve 4k  -75%
 Thinking:       high (2-4k reasoning)    low (300-600)        -70%
 ──────────────────────────────────────────────────────────────
-TOTAL per turn: ~4,084 tok       →     ~815 tok               -80%
-Cost on Opencode/Cerebras/Groq:  ~$0.04 → ~$0.008 per 10 turns
-Context window:  chokes at ~30 turns → 120+ turns before compaction
+Vanilla pi:     ~2,228 tok       →     ~815 tok               -63%
++ My 29 .kilo skills*: ~1,856 tok injected  0 tok (opt-in)    -100%
+With my skills: ~4,084 tok       →     ~815 tok               -80%
+*I added 29 custom skills (~/.kilo/skills) — vanilla pi has 0
+Cost on Opencode/Cerebras/Groq:  ~$0.04 → ~$0.008 per 10 turns (with my skills)
+Context: ~30 turns → 120+ turns before compaction
 ```
 
 > **Real session:** 50-turn audit that cost $1.20 on pi now costs $0.24 on pi-bare. Same patch, same tests green.

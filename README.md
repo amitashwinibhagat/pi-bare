@@ -27,17 +27,18 @@ BEFORE (pi 0.84.2)                         AFTER (pi-bare) — est. chars/4
 ─────────────────────────────────        ─────────────────────────────────
 System prompt:  ~1,712 chars (~428 tok*)   ~47 chars (~12 tok*)    ~-97%  (*est.)
 Tool schemas:   4 tools verbose            2 tools terse             smaller
-Compaction:     keep 20,000 / reserve 16,384   keep 4,096 / reserve 4,000
-Thinking:       configurable (e.g. high)   configurable (e.g. low) — you choose
+Compaction:     keep 20,000 / reserve 16,384   same as vanilla (20k/16k)*
+Thinking:       configurable               configurable — same
 ─────────────────────────────────        ─────────────────────────────────
-Vanilla prompt + tools (est.):  ~2,000-2,400 tok  →  ~800-900 tok   ~-60%
+Vanilla prompt + tools (est.):  ~2,000-2,400 tok  →  ~1,100-1,300 tok   ~-35-45% per turn
 With N custom skills: each ~50-65 tok in old <available_skills> XML → 0 tok unless PI_BARE_SKILLS=1
 
 *Token est. using chars/4 heuristic; provider tokenizers differ. Measure with your model.
+*Compaction previously 4,096/4,000 in pi-bare; reverted to vanilla to preserve history — long sessions now cost ~same.
 *Vanilla pi ships with 0 skills; my settings.json lists 29 ~/.kilo/skills paths but files not present, so 0 injected currently.
 ```
 
-> **Example:** Fewer prompt tokens = fewer input tokens billed each turn. Actual saving depends on provider, model, and session length.
+> **Example:** Smaller prompt = fewer input tokens billed each turn (~15-25% per session as history dominates). Actual saving depends on provider, model, and session length. Verify with `--verbose` token counts.
 
 ### Why 2 tools beat 7
 
@@ -51,13 +52,13 @@ With N custom skills: each ~50-65 tok in old <available_skills> XML → 0 tok un
 
 **The model already knows bash.**
 
-### When this helps
+### When this helps (workload-dependent)
 
-- **Free-tier / low-cost models** (`muse-spark-free` via Opencode/TokenRouter, etc.): fewer prompt tokens per turn can lower cost — actual cost depends on pricing.
-- **Latency-sensitive providers** (Groq / Cerebras / etc.): smaller prompt can reduce time-to-first-token; gains vary by provider.
+- **Free-tier / low-cost models** (`muse-spark-free` via Opencode/TokenRouter, etc.): fewer prompt tokens per turn lowers input cost — overall saving ~15-25% per session, varies by pricing.
 - **Self-hosted / Ollama / llama.cpp:** slimmer prompt leaves more room in tight context windows.
-- **Long sessions:** optional skill/context injection (opt-in via `PI_BARE_SKILLS=1` / `PI_BARE_CTX=1`) keeps prompt small when not needed.
-- **Simpler reasoning:** shorter prompt = less to parse; effects vary by model.
+- **Long sessions:** same compaction as vanilla (`20k/16k`), so history preserved; prompt saving amortizes — not `30->120 turns`.
+- **Latency:** smaller prompt *may* reduce time-to-first-token; gains vary by provider — measure, don't assume.
+- **Opt-in extras:** `PI_BARE_SKILLS=1` / `PI_BARE_CTX=1` to re-enable skills/context only when needed.
 
 ### Quick start
 

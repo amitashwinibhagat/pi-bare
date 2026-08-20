@@ -16,7 +16,7 @@ Fork of `badlogic/pi-mono`. Default is **read+bash only**.
 
 *Token est. using chars/4 heuristic; provider tokenizers differ.
 
-**Total (est.): vanilla ~2,000-2,400 tok → ~800-900 tok (~-60%). With N skills, subtract ~50-65 tok per skill that would have been injected.**
+**Total (est.): vanilla ~2,000-2,400 tok → ~1,100-1,300 tok (~-35-45% per turn, ~15-25% per session as history dominates). With N skills, subtract ~50-65 tok per skill that would have been injected. Compaction is now same as vanilla; previous 800-900 tok / -60% included 4096/4000 which summarized history too aggressively.**
 
 ## Usage
 

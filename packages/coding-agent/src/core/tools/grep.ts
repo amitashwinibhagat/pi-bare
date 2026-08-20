@@ -22,17 +22,17 @@ import {
 } from "./truncate.ts";
 
 const grepSchema = Type.Object({
-	pattern: Type.String({ description: "Search pattern (regex or literal string)" }),
-	path: Type.Optional(Type.String({ description: "Directory or file to search (default: current directory)" })),
-	glob: Type.Optional(Type.String({ description: "Filter files by glob pattern, e.g. '*.ts' or '**/*.spec.ts'" })),
-	ignoreCase: Type.Optional(Type.Boolean({ description: "Case-insensitive search (default: false)" })),
+	pattern: Type.String({ description: "pattern" }),
+	path: Type.Optional(Type.String({ description: "path" })),
+	glob: Type.Optional(Type.String({ description: "glob" })),
+	ignoreCase: Type.Optional(Type.Boolean({ description: "i" })),
 	literal: Type.Optional(
-		Type.Boolean({ description: "Treat pattern as literal string instead of regex (default: false)" }),
+		Type.Boolean({ description: "literal" }),
 	),
 	context: Type.Optional(
-		Type.Number({ description: "Number of lines to show before and after each match (default: 0)" }),
+		Type.Number({ description: "ctx" }),
 	),
-	limit: Type.Optional(Type.Number({ description: "Maximum number of matches to return (default: 100)" })),
+	limit: Type.Optional(Type.Number({ description: "limit" })),
 });
 
 export const grepToolSystemPromptContribution = {
@@ -133,7 +133,7 @@ export function createGrepToolDefinition(
 	return {
 		name: "grep",
 		label: "grep",
-		description: `Search file contents for a pattern. Returns matching lines with file paths and line numbers. Respects .gitignore. Output is truncated to ${DEFAULT_LIMIT} matches or ${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first). Long lines are truncated to ${GREP_MAX_LINE_LENGTH} chars.`,
+		description: "Grep",
 		promptSnippet: grepToolSystemPromptContribution.snippet,
 		parameters: grepSchema,
 		async execute(

@@ -136,11 +136,10 @@ export function createTool(toolName: ToolName, cwd: string, options?: ToolsOptio
 }
 
 export function createCodingToolDefinitions(cwd: string, options?: ToolsOptions): ToolDef[] {
+	// BARE-BONE: default is read+bash only. edit/write are opt-in via --tools edit,write
 	return [
 		createReadToolDefinition(cwd, options?.read),
 		createBashToolDefinition(cwd, options?.bash),
-		createEditToolDefinition(cwd, options?.edit),
-		createWriteToolDefinition(cwd, options?.write),
 	];
 }
 
@@ -169,8 +168,6 @@ export function createCodingTools(cwd: string, options?: ToolsOptions): Tool[] {
 	return [
 		createReadTool(cwd, options?.read),
 		createBashTool(cwd, options?.bash),
-		createEditTool(cwd, options?.edit),
-		createWriteTool(cwd, options?.write),
 	];
 }
 

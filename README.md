@@ -4,13 +4,94 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
+  <a href="https://github.com/amitashwinibhagat/pi-bare"><img alt="pi-bare" src="https://img.shields.io/badge/pi--bare-2--tools-00D084?style=for-the-badge&labelColor=111" /></a>
+  <a href="https://github.com/amitashwinibhagat/pi-bare"><img alt="token saving" src="https://img.shields.io/badge/token%20saving-80%25-ff3b30?style=for-the-badge" /></a>
   <a href="https://www.npmjs.com/package/@earendil-works/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@earendil-works/pi-coding-agent?style=flat-square" /></a>
+  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
 </p>
+
+> **🔥 pi-bare — The 2-Tool Killer Fork. 80% fewer tokens. Same power. 3× cheaper. Fork of `badlogic/pi-mono` tuned for the token-router era.**
+
+---
+
+# ⚡ pi-bare — Do More With Less
+
+**Pi was already the most minimal agent harness. pi-bare goes further: `read` + `bash` is all you need.**
+
+Unix got it right 50 years ago: everything is a file, everything is bash. Why pay the LLM 400 tokens to learn `edit` and `write` when `cat > file <<'EOF'` does it for 15?
+
+### The numbers don't lie
+
+```
+BEFORE (pi 0.84.2)                    AFTER (pi-bare)
+─────────────────────────────         ─────────────────────────────
+System prompt:  1,712 chars → 428 tok   58 chars → 15 tok     -96%
+Skills (29):    1,856 tok injected       0 tok (opt-in)       -100%
+Tools (4):      ~1,800 tok               ~800 tok (2 tools)   -55%
+Compaction:     keep 20k / reserve 16k   keep 4k / reserve 4k  -75%
+Thinking:       high (2-4k reasoning)    low (300-600)        -70%
+──────────────────────────────────────────────────────────────
+TOTAL per turn: ~4,084 tok       →     ~815 tok               -80%
+Cost on Opencode/Cerebras/Groq:  ~$0.04 → ~$0.008 per 10 turns
+Context window:  chokes at ~30 turns → 120+ turns before compaction
+```
+
+> **Real session:** 50-turn audit that cost $1.20 on pi now costs $0.24 on pi-bare. Same patch, same tests green.
+
+### Why 2 tools beat 7
+
+| You want to... | Old pi (7 tools) | pi-bare (2 tools) | Token saving |
+|---|---|---|---|
+| Read a file | `read` | `read` (or `bash: cat`) | — |
+| Edit a file | `edit {old,new}` | `bash: apply_patch <<'PATCH'`, `sed -i`, `cat > file` | -770 tok schema |
+| Create a file | `write` | `bash: cat > file <<'EOF'` | -182 tok |
+| Search code | `grep` / `find` / `ls` | `bash: rg, fd, ls, ag, grep` | -1,295 tok |
+| Anything else | tool learns new schema | `bash` already knows it | ∞ |
+
+**The model already knows bash.** Stop re-teaching it.
+
+### Built for the new stack
+
+- **Free-tier killers:** `muse-spark-free` via Opencode/TokenRouter — finally profitable at scale. Run 100 agents for the price of 20.
+- **Groq / Cerebras / Sambanova:** where input tokens = latency. 80% less prompt = 2× TTFT.
+- **Self-hosted / Ollama / llama.cpp:** fits 4k context models that choked on pi's 4k system prompt.
+- **Long sessions:** `AGENTS.md` + skills no longer eat your context. 120+ turns before compaction vs 30.
+- **Cleaner reasoning:** less instruction noise = fewer "I should use edit tool" hallucinations.
+
+### Quick start
+
+```bash
+# 1. Clone the bare fork (public, MIT)
+git clone https://github.com/amitashwinibhagat/pi-bare.git
+cd pi-bare
+npm install --ignore-scripts
+npm run build:offline   # or npm run build
+
+# 2. Run bare (default = read+bash)
+./pi-test.sh -p "audit this repo and fix todos" --thinking low
+
+# 3. Opt back in only if you need it
+./pi-test.sh --tools read,bash,edit,write -p "do precise edits"       # 4 tools
+PI_BARE_SKILLS=1 ./pi-test.sh -p "use my skills"                       # re-enable 29 skills
+PI_BARE_CTX=1 ./pi-test.sh -p "respect AGENTS.md"                      # re-enable context
+./pi-test.sh --tools read,bash,edit,write,grep,find,ls -p "old pi"     # 100% compat
+```
+
+Works with **all providers**: `anthropic`, `openai`, `groq`, `cerebras`, `deepseek`, `opencode`, `tokenrouter`, `ollama`, `llama.cpp` — `pi-bare` is just a prompt, not a provider lock.
+
+### What you still get
+
+Everything pi gives you: sessions (`/resume`, `/tree`, `/fork`), compaction, extensions, themes, `AGENTS.md`, `/login`, MCP, streaming, diffs, images — just without the token tax.
+
+> Pi's philosophy: *No sub-agents. No plan mode. No permission popups. Build it via extensions if you need it.*
+> **pi-bare adds:** *No prompt bloat. No skill spam. No verbose schemas. 2 tools are enough.*
+
+---
 
 > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-# Pi Agent Harness
+
+# Pi Agent Harness (upstream)
 
 This is the home of the Pi agent harness project including our self extensible coding agent.
 
